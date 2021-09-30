@@ -1,0 +1,10 @@
+{
+	"name" : "hl-derplanner",
+	"url" : "https://github.com/onehundredfeet/hl-derplanner",
+	"license" : "MIT",
+	"contributors" : ["onehundredfeet"],
+	"description" : "derplanner support for Haxe HL/JS.",
+	"version" : "0.1.0",
+	"releasenote" : "",
+	"dependencies": { "hl-idl" : ""}
+}

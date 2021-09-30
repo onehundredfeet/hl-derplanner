@@ -1,0 +1,3 @@
+[submodule "ext/derplanner"]
+	path = ext/derplanner
+	url = https://github.com/onehundredfeet/derplanner.git

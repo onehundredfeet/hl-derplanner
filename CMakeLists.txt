@@ -36,6 +36,7 @@ ${DERPLANNER_SRC_DIR}/memory.cpp
 ${DERPLANNER_SRC_DIR}/planning.cpp
 src/derplanner.cpp
 src/hl-idl-helpers.cpp
+src/domains/travel/travel.cpp
 )
 
 set_target_properties(derplanner.hdll

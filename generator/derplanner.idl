@@ -92,3 +92,11 @@ interface DomainInfo
 interface MemoryDefault {
 
 };
+
+[NoDelete]
+interface TravelDomain {
+    [Internal="travel_init_domain_info", Static] void info();
+    [Internal="travel_get_domain_info", Static] DomainInfo get();
+
+};
+

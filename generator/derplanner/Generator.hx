@@ -14,7 +14,7 @@ class Generator {
 #include <derplanner/runtime/database.h>
 #include <derplanner/runtime/planning.h>
 #include \"hl-idl-helpers.h\"
-
+#include \"domains/travel/travel.h\"
 using namespace plnnr;
 ";
 

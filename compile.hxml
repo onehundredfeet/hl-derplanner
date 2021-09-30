@@ -1,4 +1,6 @@
 -lib hl-idl
 -lib hvector
+-hl bin/target
 --class-path tests
 --class-path src
+--main Test

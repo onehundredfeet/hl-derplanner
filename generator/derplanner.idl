@@ -40,23 +40,41 @@ interface FactTable
     // type (format) of the stored data tuples.
     //Fact_Type       format;
     // current number of entries stored.
-    attribute int        num_entries;
+    //attribute int        num_entries;
     // total allocated number of entries.
-    attribute int        max_entries;
+    //attribute int        max_entries;
     // block of memory accommodating entries' data.
     //void*           blob;
     // tuples in SOA layout.
     //void*           columns[Max_Fact_Arity];
     // allocator.
     //Memory*         memory;
+    [Internal="plnnr::add_entry", CObject]void addEntry( int i );
+    [Internal="plnnr::add_entry", CObject]void addEntry( int a, int b );
+    
+
 };
 
 // A set of fact tables.
+
+[Internal="plnnr::Memory_Default"]
+interface MemoryDefault {
+    void MemoryDefault();
+};
+
+[Internal="plnnr::Database_Format"]
+interface DatabaseFormat {
+    [Internal="num_tables"] attribute int numTables;
+};
 
 [Internal="plnnr::Fact_Database"]
 interface FactDatabase
 {
     void FactDatabase ();
+
+    //plnnr::init(&db, &default_mem, &domain->database_req);
+    [Internal="plnnr::init", CObject] void init(MemoryDefault mem, DatabaseFormat fmt);
+    [Internal="plnnr::find_table", CObject, Const] FactTable findTable(String name);
 
     // current number of tables.
     attribute int        num_tables;
@@ -83,20 +101,36 @@ interface DomainInfo
     // generated tasks info.
     //Task_Info           task_info;
     // required fact database format.
-    //Database_Format     database_req;
+//    DatabaseFormat     database_req;
+    
+    [Internal="domain_info_get_format", CObject] DatabaseFormat getFormat();
+
     // symbols used in domain.
    // Symbol_Table        symbols;
 };
  
-[Internal="plnnr::Memory_Default"]
-interface MemoryDefault {
 
-};
 
 [NoDelete]
 interface TravelDomain {
-    [Internal="travel_init_domain_info", Static] void info();
-    [Internal="travel_get_domain_info", Static] DomainInfo get();
+    [Internal="travel_init_domain_info", Static] void init();
+    [Internal="travel_get_domain_info", Static, Const] DomainInfo get();
 
 };
 
+
+[Internal="plnnr::Planning_State_Config"]
+interface PlanningStateConfig {
+    void PlanningStateConfig();
+
+    // maximum expansion depth.
+    attribute int    max_depth;
+    // maximum plan length.
+    attribute int    max_plan_length;
+    // maximum size of the domain to database binding (i.e. table indices mapping).
+    attribute int    max_bound_tables;
+    // maximum size of the expansions data block (arguments & preconditions).
+    attribute int    expansion_data_size;
+    // maximum size of the plan data block (arguments & preconditions).
+    attribute int    plan_data_size;
+};

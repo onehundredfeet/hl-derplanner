@@ -49,8 +49,8 @@ interface FactTable
     //void*           columns[Max_Fact_Arity];
     // allocator.
     //Memory*         memory;
-    [Internal="plnnr::add_entry", CObject]void addEntry( int i );
-    [Internal="plnnr::add_entry", CObject]void addEntry( int a, int b );
+    [Internal="plnnr::add_entry", CObject]void addEntry( uint i );
+    [Internal="plnnr::add_entry", CObject]void addEntry( uint a, uint b );
     
 
 };
@@ -105,6 +105,13 @@ interface DomainInfo
     
     [Internal="domain_info_get_format", CObject] DatabaseFormat getFormat();
 
+    [Internal="plnnr::get_task_name", CObject, Get="hl_utf8_to_hlstr"]
+    String getTaskName( uint taskType );
+
+    [Internal="plnnr::get_task_param_layout", CObject,  Value]
+    ParamLayout getTaskParamLayout( uint taskType );
+
+
     // symbols used in domain.
    // Symbol_Table        symbols;
 };
@@ -118,19 +125,100 @@ interface TravelDomain {
 
 };
 
+[NoDelete]
+interface Tuple {
+    [Static, Internal="as_Id32"] int asID(VoidPtr tuple, [Deref]ParamLayout layout, uint index);
+    [Static, Internal="as_Id32"] int asElementID(VoidPtr tuple, [Deref]ParamLayout layout, uint element, uint index);    
+
+};
+
+// Primitive (or compound) task in the plan.
+[Internal="plnnr::Task_Frame"]
+interface TaskFrame
+{
+    // compound/primitive task type.
+    attribute uint    task_type;
+    // offset in Planning_State::task_blob before any data is written.
+    attribute uint    orig_blob_size;
+    // pointer to the task arguments.
+
+    [Const] attribute VoidPtr arguments;
+    //void*       arguments;
+
+};
+
+// Helper to wrap an array of tasks `Task_Frame`, memory is owned by `Planning_State`. 
+[Internal="plnnr::Plan"]
+interface Plan
+{
+    // array of tasks.
+    [Ref,Const,Internal="tasks", Indexed] TaskFrame getTaskFrame(int idx);
+
+    // number of tasks in the plan.
+    attribute uint                length;
+};
+
 
 [Internal="plnnr::Planning_State_Config"]
 interface PlanningStateConfig {
     void PlanningStateConfig();
 
     // maximum expansion depth.
-    attribute int    max_depth;
+    attribute int max_depth;
     // maximum plan length.
-    attribute int    max_plan_length;
+    attribute int max_plan_length;
     // maximum size of the domain to database binding (i.e. table indices mapping).
-    attribute int    max_bound_tables;
+    attribute int max_bound_tables;
     // maximum size of the expansions data block (arguments & preconditions).
-    attribute int    expansion_data_size;
+    attribute int expansion_data_size;
     // maximum size of the plan data block (arguments & preconditions).
-    attribute int    plan_data_size;
+    attribute int plan_data_size;
 };
+
+
+
+[Internal="Find_Plan_Status"] enum FindPlanStatus
+{
+    // failed to find a plan for the current set of facts.
+    "Find_Plan_Failed",
+    // plan found.
+    "Find_Plan_Succeeded",
+    // `find_plan_step` exits with `Find_Plan_In_Progress`, when a primitive task is added to the task stack, or compound task added to the expansion stack.
+    "Find_Plan_In_Progress",
+    // `find_plan_step` exits with `Find_Plan_Max_Depth_Exceeded` when there's no space left in the expansion stack.
+    "Find_Plan_Max_Depth_Exceeded",
+    // `find_plan_step` exits with `Find_Plan_Max_Plan_Length_Exceeded` when there's no space left in the task stack.
+    "Find_Plan_Max_Plan_Length_Exceeded"
+};
+
+
+// Describes layout of task parameters in memory.
+[Internal="Param_Layout"]
+interface ParamLayout
+{
+    // number of parameters.
+    [Internal="num_params"] attribute uint     numParams;
+    // size in bytes needed for this layout.
+    attribute uint      size;
+    // required alignment of the layout, maximum of the param alignments.
+    attribute uint      alignment;
+    // type of each parameter.
+    //Type*       types;
+    // offset in bytes for each parameter.
+    //size_t*     offsets;
+};
+
+
+[Internal="plnnr::Planning_State"]
+interface PlanningState {
+    void PlanningState();
+    
+    [Internal="plnnr::init", CObject] void init(MemoryDefault mem, PlanningStateConfig cfg);
+    [Internal="plnnr::bind", CObject] void bind(DomainInfo domain, FactDatabase db);
+    [Internal="plnnr::find_plan", CObject] FindPlanStatus findPlan( FactDatabase db, DomainInfo domain);
+    [Internal="plnnr::get_plan", CObject,Value] Plan getPlan();
+    
+
+};
+
+

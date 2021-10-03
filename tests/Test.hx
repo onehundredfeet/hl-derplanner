@@ -10,22 +10,22 @@ class Test {
 
 static function print_tuple( name : String,  values : VoidPtr,  layout : ParamLayout)
 {
-    trace(name + "(");
+    var line = name + "(";
 
     for ( i in 0...layout.numParams) {
 //        trace("" + i);
         var value = derplanner.Native.Tuple.asID(values, layout, i);
   //      trace("Value" + value);
 //        var value = plnnr::as_Id32(values, layout, i);
-        trace(objects[value]);
+        line = line + objects[value];
 
         if (i + 1 != layout.numParams)
         {
-            trace(", ");
+            line = line + ", ";
         }
     }
 
-    trace(")");
+    trace(line + ")");
 }
 
 static function print_plan(state : PlanningState, domain : DomainInfo)
@@ -39,7 +39,6 @@ static function print_plan(state : PlanningState, domain : DomainInfo)
 
 //        trace("Printing tupple");
         print_tuple(name, task.arguments, layout);
-        trace("\n");
     }
 }
 
